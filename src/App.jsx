@@ -50,8 +50,7 @@ function Articlelist({list}) {
 function Search() {
   const [searchTerm,setSearchTerm ]= useState('');
   function handleChange(event) {
-    // console.log(event.target.value)
-    // searchTerm = event.target.value;
+
     setSearchTerm(event.target.value);
     
   }
