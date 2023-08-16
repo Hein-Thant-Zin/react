@@ -1,14 +1,12 @@
-import { useState } from "react";
-
-function getName(name) {
-  return name;
-}
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from "react";
 
 export default function App() {
+ 
   const articles = [
   {
     title: 'React',
-    url: 'https://reactjs.org/',
+    url: 'https://reactjs.dev/',
     author: 'Jordan Walke',
     num_comments: 3,
     points: 4,
@@ -16,23 +14,50 @@ export default function App() {
   },
   {
     title: 'Redux',
-    url: 'https://redux.js.org/',
+    url: 'https://redux.js.dev/',
     author: 'Dan Abramov, Andrew Clark',
     num_comments: 2,
     points: 5,
     objectID: 1,
   },
-];
-  // const author = 'luuu';
+  ];
+
+  const [searchTerm, setSearchTerm] = useState(
+    localStorage.getItem('search key'||'')
+  );
+  useEffect(() => {
+    localStorage.setItem('search key',searchTerm)
+  }, [searchTerm])
+
+  const handleSearch=(event)=>  {
+    setSearchTerm(event.target.value);
+  }
+
+  const searchedArticle = articles.filter(item =>
+    item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  
   return <>
     <h1>Hacker News</h1>
-    <h1>Hello{getName('hein')}</h1>
-    <Search />
+    <Search searchTerm={searchTerm} handleSearch={handleSearch} />
       <hr />
      
-    <Articlelist list={articles} />
+    <Articlelist list={searchedArticle } />
+    
   </>
 }
+
+// eslint-disable-next-line react/prop-types
+function Search({handleSearch,searchTerm}) {
+  
+  return (
+    <div>
+      <label htmlFor="search">Search</label>
+      <input value={searchTerm} onChange={handleSearch} type="text" name="" id="" /> 
+    </div>
+  )
+}
+
 
 // eslint-disable-next-line react/prop-types
 function Articlelist({list}) {
@@ -41,24 +66,25 @@ function Articlelist({list}) {
       {/* eslint-disable-next-line react/prop-types*/}
       {list.map((item) => 
          (
-          <li key={item.objectID}>{ item.title}</li>
+          <Article key={item.objectID} article={item} />
         )
       )}
       </ul>
   )
 }
-function Search() {
-  const [searchTerm,setSearchTerm ]= useState('');
-  function handleChange(event) {
-
-    setSearchTerm(event.target.value);
-    
-  }
+// eslint-disable-next-line react/prop-types
+function Article({article}) {
+  const { url,title ,author,num_comments,points } = article;
   return (
-    <div>
-      <label htmlFor="search">Search</label>
-      <input onChange={handleChange} type="text" name="" id="" />
-      <p>{ searchTerm}</p>
-    </div>
+    // eslint-disable-next-line react/prop-types
+    <li >
+      <span><a href={url}>{title}</a></span>
+      <span>{author}</span>
+      <span>{num_comments}</span>
+      <span>{points}</span>
+    </li>
   )
+  
 }
+
+
