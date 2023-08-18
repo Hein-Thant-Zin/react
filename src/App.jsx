@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function App() {
  
-  const articles = [
+  const initialStories = [
   {
     title: 'React',
     url: 'https://reactjs.dev/',
@@ -22,58 +22,89 @@ export default function App() {
   },
   ];
 
-  const [searchTerm, setSearchTerm] = useState(
-    localStorage.getItem('search key'||'')
-  );
-  useEffect(() => {
-    localStorage.setItem('search key',searchTerm)
-  }, [searchTerm])
-
+  const [searchTerm, setSearchTerm] = useStorageState('search','');
+  const [stories, setStories] = useState(initialStories);
+  // const [loading, setLoading] = useState(false);
+  
+  // useEffect(() => {
+  //   setLoading(true);
+  // })
+ 
+ 
   const handleSearch=(event)=>  {
     setSearchTerm(event.target.value);
   }
 
-  const searchedArticle = articles.filter(item =>
+  const searchedArticle = stories.filter((item) =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  )
+ 
   
+  const handleRemoveStory = (item) => {
+    const newStories = stories.filter(
+      story => story.objectID !== item.objectID
+    );
+
+    setStories(newStories);
+
+    
+  }
   return <>
     <h1>Hacker News</h1>
-    <Search searchTerm={searchTerm} handleSearch={handleSearch} />
+    <InputWithLabel  id='search' value={searchTerm} onInputChange={handleSearch} label= 'Search' />
       <hr />
-     
-    <Articlelist list={searchedArticle } />
+    <Articlelist list={searchedArticle} handleRemoveStory={handleRemoveStory} />
     
   </>
 }
 
 // eslint-disable-next-line react/prop-types
-function Search({handleSearch,searchTerm}) {
+function InputWithLabel({
+  id, label, value, onInputChange, type = 'text',isFocused
+}) {
+
+  const inputRef = useRef(); 
+
+
+  //persist across re-render
+  useEffect(() => {
+    //user is focusing that element or not
+    //isFocused => user is focusing but dont know which one yet
+    //inputRef.current =>user is focusing only one element
+    if (isFocused && inputRef.current) {
+      inputRef.current.focus()
+    }
+    //this will work depends on isFocus(whenever the user is focusing)
+  }, [isFocused])
+  
   
   return (
-    <div>
-      <label htmlFor="search">Search</label>
-      <input value={searchTerm} onChange={handleSearch} type="text" name="" id="" /> 
-    </div>
+    <>
+      <label htmlFor={id}>{label}</label>
+      <input
+        //this element will be reference in inputRef.current object
+        ref={inputRef} value={value} onChange={onInputChange} type={type} name="" id={id}
+      /> 
+    </>
   )
 }
 
 
 // eslint-disable-next-line react/prop-types
-function Articlelist({list}) {
+function Articlelist({list,handleRemoveStory}) {
   return (
      <ul>
       {/* eslint-disable-next-line react/prop-types*/}
       {list.map((item) => 
          (
-          <Article key={item.objectID} article={item} />
+          <Article key={item.objectID} article={item} handleRemoveStory={handleRemoveStory}/>
         )
       )}
       </ul>
   )
 }
 // eslint-disable-next-line react/prop-types
-function Article({article}) {
+function Article({article,handleRemoveStory}) {
   const { url,title ,author,num_comments,points } = article;
   return (
     // eslint-disable-next-line react/prop-types
@@ -82,9 +113,20 @@ function Article({article}) {
       <span>{author}</span>
       <span>{num_comments}</span>
       <span>{points}</span>
+      <button onClick={()=>handleRemoveStory(article)}>Delete</button>
     </li>
   )
   
+}
+
+const useStorageState=(key,initialState) => {
+     const [value, setValue] = useState(
+    localStorage.getItem(key)||initialState
+  );
+  useEffect(() => {
+    localStorage.setItem(key,value)
+  }, [key,value])
+  return [value, setValue]; 
 }
 
 
