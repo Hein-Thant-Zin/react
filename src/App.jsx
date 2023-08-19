@@ -22,14 +22,30 @@ export default function App() {
   },
   ];
 
-  const [searchTerm, setSearchTerm] = useStorageState('search','');
-  const [stories, setStories] = useState(initialStories);
-  // const [loading, setLoading] = useState(false);
+  //mock API fetching
+  const getAsyncStories = () => 
+    new Promise((resolve) => 
+      setTimeout(() => {
+        resolve({ data: initialStories })
+      }, 2000)
+    );
   
-  // useEffect(() => {
-  //   setLoading(true);
-  // })
+
+  const [searchTerm, setSearchTerm] = useStorageState('search','');
+  const [stories, setStories] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  useEffect(() => {
+    setLoading(true);
+    getAsyncStories().then((result) => {
+      setStories(result.data);
+      setLoading(false);
+    })
+  },[])
  
+  if (loading) {
+    return <p>Loading...</p>
+  }
  
   const handleSearch=(event)=>  {
     setSearchTerm(event.target.value);
