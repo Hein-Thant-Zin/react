@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 
 export default function App() {
  
@@ -32,20 +32,38 @@ export default function App() {
   
 
   const [searchTerm, setSearchTerm] = useStorageState('search','');
-  const [stories, setStories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [stories, setStories] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, SetisError] = useState(false);
+  
+  const storiesReducer = (state, action) => {
+    if (action.type === 'SET_STORIES') {
+     return action.payload;
+    } else if (action.type === 'REMOVE_STORY') {
+      return state.filter(
+        (story) => story.objectID !== action.payload.objectID
+      );
+    }
+    
+  }
+
+
+
+  // useReducer
+  //reducer ->
+  const [stories,dispatchStories]=useReducer(storiesReducer,[])
   
   useEffect(() => {
-    setLoading(true);
-    getAsyncStories().then((result) => {
-      setStories(result.data);
-      setLoading(false);
-    })
+    setIsLoading(true);
+
+    getAsyncStories()
+      .then((result) => {
+      dispatchStories({type:'SET_STORIES',payload:result.data} )
+      setIsLoading(false);
+    }).catch(()=>SetisError(true))
   },[])
  
-  if (loading) {
-    return <p>Loading...</p>
-  }
+   
  
   const handleSearch=(event)=>  {
     setSearchTerm(event.target.value);
@@ -57,20 +75,24 @@ export default function App() {
  
   
   const handleRemoveStory = (item) => {
-    const newStories = stories.filter(
-      story => story.objectID !== item.objectID
-    );
+  
 
-    setStories(newStories);
+    // setStories(newStories);
+    dispatchStories({
+      type: 'REMOVE_STORY',
+      payload: item ,
+    })
 
     
   }
   return <>
     <h1>Hacker News</h1>
     <InputWithLabel  id='search' value={searchTerm} onInputChange={handleSearch} label= 'Search' />
-      <hr />
-    <Articlelist list={searchedArticle} handleRemoveStory={handleRemoveStory} />
+    <hr />
+    {isError ?<p>Something went wrong!!</p>:null}
     
+    {isLoading ? (<p>Loading...</p>) : (<Articlelist list={searchedArticle}
+      handleRemoveStory={handleRemoveStory} />)}    
   </>
 }
 
