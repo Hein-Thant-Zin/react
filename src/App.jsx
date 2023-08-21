@@ -1,34 +1,9 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
+
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
 export default function App() {
- 
-  const initialStories = [
-  {
-    title: 'React',
-    url: 'https://reactjs.dev/',
-    author: 'Jordan Walke',
-    num_comments: 3,
-    points: 4,
-    objectID: 0,
-  },
-  {
-    title: 'Redux',
-    url: 'https://redux.js.dev/',
-    author: 'Dan Abramov, Andrew Clark',
-    num_comments: 2,
-    points: 5,
-    objectID: 1,
-  },
-  ];
-
-  //mock API fetching
-  const getAsyncStories = () => 
-    new Promise((resolve) => 
-      setTimeout(() => {
-        resolve({ data: initialStories })
-      }, 2000)
-    );
   
     const storiesReducer = (state, action) => {
     switch (action.type) {
@@ -73,22 +48,31 @@ export default function App() {
     isLoading: false,
     isError: false
 
-  })
-  
-  useEffect(() => {
-    // setIsLoading(true);
-    dispatchStories({type:'STORIES_FETCH_INIT'})
+  });
+  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
 
-    getAsyncStories()
-      .then((result) => {
+  const handleFetch = useCallback(() => {
+     if (!searchTerm) return;
+    // setIsLoading(true);
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
+    fetch(url)
+      .then(res => res.json())
+      .then(result => {
         dispatchStories({
           type: 'STORIES_FETCH_SUCCESS',
-          payload: result.data
-        })
-      }).catch(() => dispatchStories({
-        type: 'STORIES_FETCH_FAILURE',
-      }))
-  },[])
+          payload: result.hits,     
+      })
+      }).catch(() => {
+        dispatchStories({
+          type: 'STORIES_FETCH_FAILURE',       
+      })
+    })
+  },[url]);
+  
+  useEffect(() => {
+    //early return 
+    handleFetch();
+  },[url])
  
    
  
@@ -102,24 +86,24 @@ export default function App() {
  
   
   const handleRemoveStory = (item) => {
-  
-
     // setStories(newStories);
     dispatchStories({
       type: 'REMOVE_STORY',
-      payload: item ,
+      payload: item,
     })
-
-    
+  };
+  const handleSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
   }
   return <>
     <h1>Hacker News</h1>
-    <InputWithLabel  id='search' value={searchTerm} onInputChange={handleSearch} label= 'Search' />
+    <InputWithLabel id='search' value={searchTerm} onInputChange={handleSearch} label='Search' />
+    <button onClick={handleSubmit}>Search</button>
     <hr />
     {stories.isError ?<p>Something went wrong!!</p>:null}
     
     {stories.isLoading  ? (<p>Loading...</p>) : (<Articlelist list={searchedArticle}
-      handleRemoveStory={handleRemoveStory} />)}    
+      handleRemoveStory={handleRemoveStory} />)}  
   </>
 }
 
