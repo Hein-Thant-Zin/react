@@ -4,6 +4,8 @@ import InputWithLabel from "./components/inPutWithLabel";
 import Articlelist from "./components/ArticleList";
 import useStorageState from "./hooks/useStorageState";
 import axios from "axios";
+import './App.css';
+
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -60,27 +62,30 @@ export default function App() {
   });
   const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
 
-  const handleFetch = useCallback(() => {
+  const handleFetch = useCallback(async() => {
      if (!searchTerm) return;
     // setIsLoading(true);
     dispatchStories({ type: 'STORIES_FETCH_INIT' });
-    axios.get(url)
-      .then(result => {
-        dispatchStories({
-          type: 'STORIES_FETCH_SUCCESS',
-          payload: result.data.hits,     
-      })
-      }).catch(() => {
-        dispatchStories({
-          type: 'STORIES_FETCH_FAILURE',       
-      })
-    })
+
+    try {
+      const result=await axios.get(url)
+   
+    dispatchStories({
+      type: 'STORIES_FETCH_SUCCESS',
+      payload: result.data.hits,
+    });  
+    } catch {
+       dispatchStories({
+      type: 'STORIES_FETCH_FAILURE',
+    });
+   }
+   
   },[url]);
   
   useEffect(() => {
     //early return 
     handleFetch();
-  },[url])
+  },[handleFetch])
  
    
  
@@ -88,9 +93,7 @@ export default function App() {
     setSearchTerm(event.target.value);
   }
 
-  const searchedArticle = stories.data.filter((item) =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+ 
  
   
   const handleRemoveStory = (item) => {
@@ -100,21 +103,24 @@ export default function App() {
       payload: item,
     })
   };
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     setUrl(`${API_ENDPOINT}${searchTerm}`);
   }
-  return <>
-    <h1>Hacker News</h1>
-    <InputWithLabel id='search' value={searchTerm} onInputChange={handleSearch}
+  return <section className="container">
+    <h1 className="headline">Hacker News</h1>
+    <form onSubmit={handleSubmit}>
+          <InputWithLabel id='search' value={searchTerm} onInputChange={handleSearch}
       label='Search' 
       />
-    <button onClick={handleSubmit}>Search</button>
+    <button type="submit" >Search</button>
+      </form>
     <hr />
     {stories.isError ?<p>Something went wrong!!</p>:null}
     
-    {stories.isLoading  ? (<p>Loading...</p>) : ( <Articlelist list={searchedArticle}
+    {stories.isLoading  ? (<p>Loading...</p>) : ( <Articlelist list={stories.data}
       handleRemoveStory={handleRemoveStory} />)}  
-  </>
+  </section>
 }
 
 // eslint-disable-next-line react/prop-types
