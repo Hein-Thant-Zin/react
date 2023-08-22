@@ -92,10 +92,6 @@ export default function App() {
   const handleSearch=(event)=>  {
     setSearchTerm(event.target.value);
   }
-
- 
- 
-  
   const handleRemoveStory = (item) => {
     // setStories(newStories);
     dispatchStories({
