@@ -4,7 +4,7 @@
 .item{
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 9px;
 }
 .item > span{
     white-space: nowrap;
