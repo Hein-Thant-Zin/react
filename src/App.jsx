@@ -62,7 +62,7 @@ export default function App() {
 
   });
   const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
-console.log('stories',stories.data);
+// console.log('stories',stories.data);
   function calculateSumofComments(items) {
     return items.data.reduce((result, value) => result + value.num_comments, 0  
     );
