@@ -63,19 +63,19 @@ export default function App() {
   });
   const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
 // console.log('stories',stories.data);
-  function calculateSumofComments(items) {
-    return items.data.reduce((result, value) => result + value.num_comments, 0  
-    );
-  }
-  const sumOfComments = useMemo(()=>calculateSumofComments(stories),
-  [stories])
+  // function calculateSumofComments(items) {
+  //   return items.data.reduce((result, value) => result + value.num_comments, 0  
+  //   );
+  // }
+  // const sumOfComments = useMemo(()=>calculateSumofComments(stories),
+  // [stories])
 
   // const sumOfComments = calculateSumofComments(stories);
 //  console.log(sumOfComments);
   
-  useEffect(() => {
-    console.log(sumOfComments);
-  },[stories])
+  // useEffect(() => {
+  //   console.log(sumOfComments);
+  // },[stories])
   const handleFetch = useCallback(async() => {
     //  if (!searchTerm) return;
     // setIsLoading(true);
