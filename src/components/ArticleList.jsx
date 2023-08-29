@@ -25,16 +25,16 @@ const Articlelist = memo(({ list, handleRemoveStory }) => {
   const sortedList = sort.isReverse ? sortFunction(list).reverse() : sortFunction(list) ;
   // sortBy('stories',sort)
   return (
-     <ul className='item-container'>
+     <ul style={{ marginTop:'1rem' }} className='item-container'>
 
       <li style={{ display: 'flex', fontWeight:'700',alignItems:'center' ,fontSize:'20px',marginBottom:'1rem'}}>
          <span style={{ width: '40%' }}>
           <button onClick={() => handleSort('TITLE')}>Title</button>
         </span>
-        <span style={{ width: '30%' }}>
+        <span style={{ width: '20%' }}>
           <button onClick={() => handleSort('AUTHOR')}>Author</button>
         </span>
-        <span style={{ width: '10%' }}>
+        <span style={{ width: '20%' }}>
           <button onClick={() => handleSort('COMMENT')}>Comments</button>
         </span>
         <span style={{ width: '10%' }}>
@@ -58,8 +58,8 @@ function Article({article,handleRemoveStory}) {
     // eslint-disable-next-line react/prop-types
     <li className='item' >
       <span style={{ width:"40%" }}><a href={url}>{title}</a></span>
-      <span style={{ width:"30%" }}>{author}</span>
-      <span style={{ width:"10%" }}>{num_comments}</span>
+      <span style={{ width:"20%" }}>{author}</span>
+      <span style={{ width:"20%" }}>{num_comments}</span>
       <span style={{ width: "10%" }}>{points}</span>
       <button  className='button'  style={{ width:"10% " }} onClick={()=>handleRemoveStory(article)}><Tick height='30px' width='50px' /></button>
     </li>

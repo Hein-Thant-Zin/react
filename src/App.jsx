@@ -12,8 +12,9 @@ const API_BASE = 'https://hn.algolia.com/api/v1/';
 const API_SEARCH = 'search';
 const PARAM_SEARCH = 'query=';
 const PARAM_PAGE = 'page=';
+const HITS_PER_PAGE='hitsPerPage=11'
 
-const getUrl = (searchTerm,page) => `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`;
+const getUrl = (searchTerm,page) => `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}&${HITS_PER_PAGE}`;
  const storiesReducer = (state, action) => {
     switch (action.type) {
       case 'STORIES_FETCH_INIT':
@@ -130,11 +131,11 @@ export default function App() {
   }
   return <section className="container">
     <h1 className="headline">Hacker News</h1>
-    <form onSubmit={handleSubmit}>
+    <form style={{ float:"right" }} onSubmit={handleSubmit}>
           <InputWithLabel id='search' value={searchTerm} onInputChange={handleSearch}
-      label='Search' 
+      
       />
-    <button type="submit" >Search</button>
+    <button className="btn" type="submit" >Search</button>
     </form>
         <br />
     <hr />
@@ -145,10 +146,12 @@ export default function App() {
      
     <Articlelist list={stories.data}
       handleRemoveStory={handleRemoveStory} />
-     {stories.isLoading ? (<p>Loading...</p>) : (  <div className="btn-container">
-      <button className="btn" type="button" onClick={handleLoadMore}>
-            Load more
+     {stories.isLoading ? (<div style={{ textAlign:'center'  }} ><p >Loading...</p></div>) : (  <div className="btn-container">
+      <div style={{ textAlign:'center'  }} >
+         <button  className="btn" type="button" onClick={handleLoadMore}>
+            Load more...
       </button>
+     </div>
     </div>)}
    
   </section>

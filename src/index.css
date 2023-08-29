@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
 :root{
-    --primary-color:#f56565; 
+    --primary-color: rgb(17, 13, 13); 
     --secondary-clr: #f7fafc;
     --text-clr: #1a202c;
     --gray-light: #e1e1e1;
@@ -27,5 +27,21 @@ button{
     font: inherit;
     background-color: transparent;
     border: none;
+
     cursor:pointer;
+}
+.btn{
+    background-color: var(--primary-color);
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: none;
+    color: #ffff;
+    font-weight: 600;
+    border: 1px solid black;
+    
+}
+.btn:hover{
+    opacity: 0.8;
+    cursor: pointer;
+    transition:cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

@@ -15,3 +15,6 @@
 .item span a{
     color: inherit;
 }
+span{
+    align-items: center;
+}
