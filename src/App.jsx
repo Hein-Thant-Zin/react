@@ -8,11 +8,13 @@ import './App.css';
 
 
 
-const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+const API_BASE = 'https://hn.algolia.com/api/v1/';
+const API_SEARCH = 'search';
+const PARAM_SEARCH = 'query=';
+const PARAM_PAGE = 'page=';
 
-export default function App() {
-  
-    const storiesReducer = (state, action) => {
+const getUrl = (searchTerm,page) => `${API_BASE}${API_SEARCH}?${PARAM_SEARCH}${searchTerm}&${PARAM_PAGE}${page}`;
+ const storiesReducer = (state, action) => {
     switch (action.type) {
       case 'STORIES_FETCH_INIT':
         return {
@@ -25,7 +27,9 @@ export default function App() {
           ...state,
           isLoading: false,
           isError: false,
-          data: action.payload,
+          data:
+            action.payload.page === 0 ? action.payload.list : state.data.concat(action.payload.list),
+          page: action.payload.page,
         };
       
       case 'STORIES_FETCH_EMPTY':
@@ -52,16 +56,18 @@ export default function App() {
         throw new Error();
     }
   }
-  
 
+export default function App() {
   const [searchTerm, setSearchTerm] = useStorageState('search', ''); 
   const [stories, dispatchStories] = useReducer(storiesReducer, {
     data: [],
     isLoading: false,
-    isError: false
+    isError: false,
+    page:0, 
 
   });
-  const [url, setUrl] = useState(`${API_ENDPOINT}${searchTerm}`);
+  const [url, setUrl] = useState(getUrl(searchTerm,0));
+
 // console.log('stories',stories.data);
   // function calculateSumofComments(items) {
   //   return items.data.reduce((result, value) => result + value.num_comments, 0  
@@ -86,7 +92,10 @@ export default function App() {
    
     dispatchStories({
       type: 'STORIES_FETCH_SUCCESS',
-      payload: result.data.hits,
+      payload: {
+        list:result.data.hits,
+        page:result.data.page
+      },
     });  
     } catch {
        dispatchStories({
@@ -99,10 +108,7 @@ export default function App() {
   useEffect(() => {
     //early return 
     handleFetch();
-  },[handleFetch])
- 
-   
- 
+  },[handleFetch]) 
   const handleSearch=(event)=>  {
     setSearchTerm(event.target.value);
   }
@@ -117,7 +123,10 @@ export default function App() {
   );
   const handleSubmit = (event) => {
     event.preventDefault();
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
+    setUrl(getUrl(searchTerm, 0));
+  };
+  const handleLoadMore = () => {
+    setUrl(getUrl(searchTerm,stories.page + 1  ))
   }
   return <section className="container">
     <h1 className="headline">Hacker News</h1>
@@ -133,8 +142,15 @@ export default function App() {
 
     {stories.isError ?<p>Something went wrong!!</p>:null}
     
-    {stories.isLoading  ? (<p>Loading...</p>) : ( <Articlelist list={stories.data}
-      handleRemoveStory={handleRemoveStory} />)}  
+     
+    <Articlelist list={stories.data}
+      handleRemoveStory={handleRemoveStory} />
+     {stories.isLoading ? (<p>Loading...</p>) : (  <div className="btn-container">
+      <button className="btn" type="button" onClick={handleLoadMore}>
+            Load more
+      </button>
+    </div>)}
+   
   </section>
 }
 
