@@ -129,8 +129,9 @@ export default function App() {
   const handleLoadMore = () => {
     setUrl(getUrl(searchTerm,stories.page + 1  ))
   }
-  return <section className="container">
-    <h1 className="headline">Hacker News</h1>
+  return <section className="container ">
+    <div style={{ position:'sticky',top:0,backgroundColor:'white' }}>
+ <h1  className="headline">Hacker News</h1>
     <form style={{ float:"right" }} onSubmit={handleSubmit}>
           <InputWithLabel id='search' value={searchTerm} onInputChange={handleSearch}
       
@@ -140,6 +141,8 @@ export default function App() {
         <br />
     <hr />
         <br />
+    </div>
+   
 
     {stories.isError ?<p>Something went wrong!!</p>:null}
     
